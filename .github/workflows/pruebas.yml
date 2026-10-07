@@ -1,0 +1,51 @@
+name: Pruebas de la API
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  newman:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    env:
+      PORT: 3000
+      MONGODB_URI: mongodb://localhost:27017/colegio_ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Revisar sintaxis
+        run: npm test
+
+      - name: Arrancar la API
+        run: |
+          npm start > servidor.log 2>&1 &
+          for i in $(seq 1 30); do
+            if grep -q "Conectado exitosamente a MongoDB" servidor.log; then exit 0; fi
+            sleep 1
+          done
+          cat servidor.log
+          exit 1
+
+      - name: Ejecutar la colección con Newman
+        run: npm run test:api
+
+      - name: Log del servidor
+        if: failure()
+        run: cat servidor.log
