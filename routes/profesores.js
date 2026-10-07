@@ -7,8 +7,11 @@ import {
   actualizarProfesorParcial,
   eliminarProfesor,
 } from "../controladores/profesoresController.js";
+import { validarId } from "../middlewares/validarId.js";
 
 const router = Router();
+
+router.param("id", validarId);
 
 router.post("/", crearProfesor);
 router.get("/", listarProfesores);

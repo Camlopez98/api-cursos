@@ -7,8 +7,11 @@ import {
   actualizarCursoParcial,
   eliminarCurso,
 } from "../controladores/cursosController.js";
+import { validarId } from "../middlewares/validarId.js";
 
 const router = Router();
+
+router.param("id", validarId);
 
 router.post("/", crearCurso);
 router.get("/", listarCursos);

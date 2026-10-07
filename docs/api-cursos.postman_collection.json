@@ -375,6 +375,37 @@
           }
         },
         {
+          "name": "Obtener curso con id mal formado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Explica que el id no es válido\", () => pm.expect(pm.response.json()).to.have.property(\"error\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/id-invalido",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "id-invalido"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
           "name": "Eliminar curso",
           "event": [
             {
@@ -780,6 +811,37 @@
           }
         },
         {
+          "name": "Obtener estudiante con id mal formado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Explica que el id no es válido\", () => pm.expect(pm.response.json()).to.have.property(\"error\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/id-invalido",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "id-invalido"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
           "name": "Eliminar estudiante",
           "event": [
             {
@@ -1179,6 +1241,37 @@
                 "api",
                 "profesores",
                 "000000000000000000000000"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Obtener profesor con id mal formado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Explica que el id no es válido\", () => pm.expect(pm.response.json()).to.have.property(\"error\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/id-invalido",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "id-invalido"
               ]
             },
             "description": ""

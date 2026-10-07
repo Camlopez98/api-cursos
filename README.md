@@ -1,5 +1,7 @@
 # API de Gestión Académica
 
+[![Pruebas de la API](https://github.com/Camlopez98/api-cursos/actions/workflows/pruebas.yml/badge.svg)](https://github.com/Camlopez98/api-cursos/actions/workflows/pruebas.yml)
+
 API REST para administrar los registros de **cursos**, **estudiantes** y **profesores** de una institución educativa. Está construida con Node.js, Express y MongoDB (Mongoose) y organizada en una arquitectura por capas que separa el enrutamiento, la lógica HTTP, la lógica de negocio y el acceso a datos.
 
 ## Tecnologías
@@ -43,10 +45,12 @@ Esta separación permite cambiar la lógica de negocio sin tocar las rutas, o su
 ```
 api-cursos/
 ├── controladores/      Lógica HTTP de cada recurso
+├── middlewares/        Validaciones comunes de las rutas (formato del id)
 ├── models/             Esquemas de MongoDB (Curso, Estudiante, Profesor)
 ├── routes/             Definición de endpoints por recurso
 ├── servicios/          Lógica de negocio y acceso a datos
 ├── docs/               Colección de Postman para probar la API
+├── .github/workflows/  Pruebas automáticas en GitHub Actions
 ├── server.js           Punto de entrada: configuración de Express y conexión a MongoDB
 ├── .env.example        Plantilla de variables de entorno
 └── package.json
@@ -108,7 +112,7 @@ Donde `{recurso}` es `cursos`, `estudiantes` o `profesores`.
 
 | Código | Situación |
 |---|---|
-| `400` | Datos inválidos: campos obligatorios ausentes, tipos incorrectos o valores duplicados |
+| `400` | Datos inválidos: campos obligatorios ausentes, tipos incorrectos, valores duplicados o un id con formato inválido |
 | `404` | No existe un registro con el id indicado |
 | `500` | Error interno del servidor o de la base de datos |
 
@@ -183,7 +187,7 @@ Todos los modelos registran automáticamente `createdAt` y `updatedAt`.
 1. En Postman, seleccionar **Import** y elegir el archivo `docs/api-cursos.postman_collection.json`.
 2. Con el servidor en ejecución, abrir la colección y usar **Run collection**.
 
-La colección incluye todas las operaciones de los tres recursos, además de casos de error (registro inexistente, campos obligatorios ausentes y valores duplicados). Al crear un registro, su `_id` se guarda automáticamente en una variable de la colección, de modo que las peticiones siguientes (obtener, actualizar y eliminar) funcionan sin copiar ids a mano. Cada petición verifica el código de estado esperado. Cada carpeta elimina al final el registro que creó, por lo que la colección se puede ejecutar varias veces seguidas.
+La colección incluye todas las operaciones de los tres recursos, además de casos de error (registro inexistente, id con formato inválido, campos obligatorios ausentes y valores duplicados). Al crear un registro, su `_id` se guarda automáticamente en una variable de la colección, de modo que las peticiones siguientes (obtener, actualizar y eliminar) funcionan sin copiar ids a mano. Cada petición verifica el código de estado esperado. Cada carpeta elimina al final el registro que creó, por lo que la colección se puede ejecutar varias veces seguidas.
 
 ### Desde la terminal (Newman)
 
@@ -192,6 +196,10 @@ Con el servidor en ejecución, la misma colección se ejecuta desde la terminal 
 ```bash
 npm run test:api
 ```
+
+### Integración continua
+
+En cada push a `main` y en cada pull request, GitHub Actions levanta una base MongoDB, arranca la API y ejecuta la colección con Newman (ver `.github/workflows/pruebas.yml`). El resultado aparece en la insignia al inicio de este README.
 
 ### Con Thunder Client (VS Code)
 
@@ -220,7 +228,6 @@ curl -X PATCH http://localhost:3000/api/cursos/<id> \
 
 ## Mejoras planificadas
 
-- Validar el formato del id (ObjectId) para responder `400` en lugar de `500` ante ids mal formados.
 - Paginación y filtros en los listados.
 - Autenticación con JWT para proteger las operaciones de escritura.
 - Pruebas automatizadas con Jest y Supertest.
