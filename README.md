@@ -90,3 +90,25 @@ npm start
   "estado": true
 }
 ```
+
+## Probar la API
+
+La colección `docs/api-cursos.postman_collection.json` recorre el CRUD completo de cursos, estudiantes y profesores. Cada carpeta crea un registro, lo consulta, lo actualiza y al final lo elimina, por lo que se puede ejecutar varias veces seguidas. Por defecto apunta a `http://localhost:3000` (variable `baseUrl`).
+
+Primero arranca el servidor con `npm start` y luego elige una de estas opciones.
+
+### Desde la terminal (Newman)
+
+No hace falta tener Postman instalado: `npx` descarga Newman automáticamente.
+
+```bash
+npm run test:api
+```
+
+### Desde VS Code (Thunder Client)
+
+1. Abre Thunder Client en la barra lateral y ve a la pestaña **Collections**.
+2. En el menú de la pestaña, elige **Import** y selecciona `docs/api-cursos.postman_collection.json`.
+3. Ejecuta las peticiones en orden (o la colección completa con **Run All**).
+
+Los scripts de prueba que guardan el `_id` creado (`cursoId`, `estudianteId`, `profesorId`) están escritos para Postman/Newman. Si tu versión de Thunder Client no los ejecuta, copia el `_id` de la respuesta del POST en la variable correspondiente de la colección antes de lanzar las peticiones que usan `/:id`.
