@@ -1,10 +1,41 @@
 {
   "info": {
-    "name": "API Cursos",
-    "description": "Pruebas CRUD de cursos, estudiantes y profesores. Cada carpeta crea un registro, lo consulta, lo actualiza y lo elimina, de modo que la colección se puede ejecutar varias veces seguidas.",
+    "name": "API de Gestión Académica",
+    "description": "Colección de pruebas de la API de cursos, estudiantes y profesores. Ejecutar con el servidor en marcha usando Run collection.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "Información de la API",
+      "item": [
+        {
+          "name": "Raíz de la API",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": []
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
     {
       "name": "Cursos",
       "item": [
@@ -54,6 +85,49 @@
                 "api",
                 "cursos"
               ]
+            }
+          }
+        },
+        {
+          "name": "Crear curso duplicado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos"
+              ]
+            },
+            "description": "Reenvía los mismos datos únicos; debe rechazarse con 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-CS101\",\n  \"nombre\": \"Programación\",\n  \"creditos\": 4,\n  \"profesor\": \"Juan Pérez\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -271,6 +345,36 @@
           }
         },
         {
+          "name": "Obtener curso inexistente (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "000000000000000000000000"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
           "name": "Eliminar curso",
           "event": [
             {
@@ -386,6 +490,49 @@
                 "api",
                 "estudiantes"
               ]
+            }
+          }
+        },
+        {
+          "name": "Crear estudiante duplicado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes"
+              ]
+            },
+            "description": "Reenvía los mismos datos únicos; debe rechazarse con 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"TEST-20241001\",\n  \"nombre\": \"Ana López\",\n  \"correo\": \"ana.test@correo.com\",\n  \"carrera\": \"Ingeniería de Sistemas\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -603,6 +750,36 @@
           }
         },
         {
+          "name": "Obtener estudiante inexistente (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "000000000000000000000000"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
           "name": "Eliminar estudiante",
           "event": [
             {
@@ -718,6 +895,49 @@
                 "api",
                 "profesores"
               ]
+            }
+          }
+        },
+        {
+          "name": "Crear profesor duplicado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores"
+              ]
+            },
+            "description": "Reenvía los mismos datos únicos; debe rechazarse con 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-P-001\",\n  \"nombre\": \"Carlos Ramírez\",\n  \"correo\": \"carlos.test@correo.com\",\n  \"especialidad\": \"Base de Datos\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -932,6 +1152,36 @@
                 "{{profesorId}}"
               ]
             }
+          }
+        },
+        {
+          "name": "Obtener profesor inexistente (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "000000000000000000000000"
+              ]
+            },
+            "description": ""
           }
         },
         {
