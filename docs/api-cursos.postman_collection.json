@@ -1,0 +1,1273 @@
+{
+  "info": {
+    "name": "API de Gestión Académica",
+    "description": "Colección de pruebas de la API de cursos, estudiantes y profesores. Ejecutar con el servidor en marcha usando Run collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Información de la API",
+      "item": [
+        {
+          "name": "Raíz de la API",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": []
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cursos",
+      "item": [
+        {
+          "name": "Crear curso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const cuerpo = pm.response.json();",
+                  "pm.test(\"Devuelve el _id del curso creado\", function () {",
+                  "    pm.expect(cuerpo).to.have.property(\"_id\");",
+                  "});",
+                  "pm.collectionVariables.set(\"cursoId\", cuerpo._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-CS101\",\n  \"nombre\": \"Programación\",\n  \"creditos\": 4,\n  \"profesor\": \"Juan Pérez\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear curso duplicado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos"
+              ]
+            },
+            "description": "Reenvía los mismos datos únicos; debe rechazarse con 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-CS101\",\n  \"nombre\": \"Programación\",\n  \"creditos\": 4,\n  \"profesor\": \"Juan Pérez\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear curso inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Devuelve un mensaje de error\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sin código\",\n  \"creditos\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar cursos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Devuelve un arreglo que incluye el curso creado\", function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an(\"array\");",
+                  "    const ids = lista.map(function (x) { return x._id; });",
+                  "    pm.expect(ids).to.include(pm.collectionVariables.get(\"cursoId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener curso por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Devuelve el curso solicitado\", function () {",
+                  "    pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get(\"cursoId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "{{cursoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar curso (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Aplica la actualización\", function () {",
+                  "    pm.expect(pm.response.json().nombre).to.eql(\"Programación Avanzada\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-CS101\",\n  \"nombre\": \"Programación Avanzada\",\n  \"creditos\": 5,\n  \"profesor\": \"Juan Pérez\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "{{cursoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar curso parcialmente (PATCH)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Aplica el cambio parcial\", function () {",
+                  "    pm.expect(pm.response.json().creditos).to.eql(3);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"creditos\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "{{cursoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener curso inexistente (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "000000000000000000000000"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Eliminar curso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Confirma la eliminación\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"mensaje\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "{{cursoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener curso eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cursos/{{cursoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cursos",
+                "{{cursoId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Estudiantes",
+      "item": [
+        {
+          "name": "Crear estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const cuerpo = pm.response.json();",
+                  "pm.test(\"Devuelve el _id del estudiante creado\", function () {",
+                  "    pm.expect(cuerpo).to.have.property(\"_id\");",
+                  "});",
+                  "pm.collectionVariables.set(\"estudianteId\", cuerpo._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"TEST-20241001\",\n  \"nombre\": \"Ana López\",\n  \"correo\": \"ana.test@correo.com\",\n  \"carrera\": \"Ingeniería de Sistemas\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear estudiante duplicado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes"
+              ]
+            },
+            "description": "Reenvía los mismos datos únicos; debe rechazarse con 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"TEST-20241001\",\n  \"nombre\": \"Ana López\",\n  \"correo\": \"ana.test@correo.com\",\n  \"carrera\": \"Ingeniería de Sistemas\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear estudiante inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Devuelve un mensaje de error\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sin matrícula\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar estudiantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Devuelve un arreglo que incluye el estudiante creado\", function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an(\"array\");",
+                  "    const ids = lista.map(function (x) { return x._id; });",
+                  "    pm.expect(ids).to.include(pm.collectionVariables.get(\"estudianteId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener estudiante por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Devuelve el estudiante solicitado\", function () {",
+                  "    pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get(\"estudianteId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/{{estudianteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "{{estudianteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar estudiante (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Aplica la actualización\", function () {",
+                  "    pm.expect(pm.response.json().nombre).to.eql(\"Ana María López\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"TEST-20241001\",\n  \"nombre\": \"Ana María López\",\n  \"correo\": \"ana.test@correo.com\",\n  \"carrera\": \"Ingeniería de Sistemas\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/{{estudianteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "{{estudianteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar estudiante parcialmente (PATCH)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Aplica el cambio parcial\", function () {",
+                  "    pm.expect(pm.response.json().estado).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/{{estudianteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "{{estudianteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener estudiante inexistente (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "000000000000000000000000"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Eliminar estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Confirma la eliminación\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"mensaje\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/{{estudianteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "{{estudianteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener estudiante eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/estudiantes/{{estudianteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "estudiantes",
+                "{{estudianteId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profesores",
+      "item": [
+        {
+          "name": "Crear profesor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const cuerpo = pm.response.json();",
+                  "pm.test(\"Devuelve el _id del profesor creado\", function () {",
+                  "    pm.expect(cuerpo).to.have.property(\"_id\");",
+                  "});",
+                  "pm.collectionVariables.set(\"profesorId\", cuerpo._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-P-001\",\n  \"nombre\": \"Carlos Ramírez\",\n  \"correo\": \"carlos.test@correo.com\",\n  \"especialidad\": \"Base de Datos\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear profesor duplicado (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores"
+              ]
+            },
+            "description": "Reenvía los mismos datos únicos; debe rechazarse con 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-P-001\",\n  \"nombre\": \"Carlos Ramírez\",\n  \"correo\": \"carlos.test@correo.com\",\n  \"especialidad\": \"Base de Datos\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear profesor inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Devuelve un mensaje de error\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sin código\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar profesores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Devuelve un arreglo que incluye el profesor creado\", function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an(\"array\");",
+                  "    const ids = lista.map(function (x) { return x._id; });",
+                  "    pm.expect(ids).to.include(pm.collectionVariables.get(\"profesorId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener profesor por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Devuelve el profesor solicitado\", function () {",
+                  "    pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get(\"profesorId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/{{profesorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "{{profesorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar profesor (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Aplica la actualización\", function () {",
+                  "    pm.expect(pm.response.json().especialidad).to.eql(\"Ingeniería de Software\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-P-001\",\n  \"nombre\": \"Carlos Ramírez\",\n  \"correo\": \"carlos.test@correo.com\",\n  \"especialidad\": \"Ingeniería de Software\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/{{profesorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "{{profesorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar profesor parcialmente (PATCH)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Aplica el cambio parcial\", function () {",
+                  "    pm.expect(pm.response.json().estado).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/{{profesorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "{{profesorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener profesor inexistente (error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "000000000000000000000000"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Eliminar profesor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Confirma la eliminación\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"mensaje\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/{{profesorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "{{profesorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener profesor eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profesores/{{profesorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profesores",
+                "{{profesorId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "cursoId",
+      "value": ""
+    },
+    {
+      "key": "estudianteId",
+      "value": ""
+    },
+    {
+      "key": "profesorId",
+      "value": ""
+    }
+  ]
+}
